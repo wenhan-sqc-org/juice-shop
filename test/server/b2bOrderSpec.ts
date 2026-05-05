@@ -22,9 +22,7 @@ describe('b2bOrder', () => {
     req = { body: { } }
     res = { json: sinon.spy(), status: sinon.spy() }
     next = sinon.spy()
-    save = () => ({
-      then () { }
-    })
+    save = () => Promise.resolve()
     challenges.rceChallenge = { solved: false, save } as unknown as Challenge
   })
 
