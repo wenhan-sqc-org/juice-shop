@@ -22,9 +22,7 @@ describe('fileServer', () => {
     res = { sendFile: sinon.spy(), status: sinon.spy() }
     req = { params: {}, query: {} }
     next = sinon.spy()
-    save = () => ({
-      then () { }
-    })
+    save = () => Promise.resolve()
   })
 
   it('should serve PDF files from folder /ftp', () => {

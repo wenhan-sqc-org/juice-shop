@@ -18,9 +18,7 @@ describe('fileUpload', () => {
   beforeEach(() => {
     req = { file: { originalname: '' } }
     res = {}
-    save = () => ({
-      then () { }
-    })
+    save = () => Promise.resolve()
   })
 
   describe('should not solve "uploadSizeChallenge" when file size is', () => {
