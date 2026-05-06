@@ -20,9 +20,7 @@ describe('easterEgg', () => {
   beforeEach(() => {
     res = { sendFile: sinon.spy() }
     req = {}
-    save = () => ({
-      then () { }
-    })
+    save = () => Promise.resolve({})
   })
 
   it('should serve /frontend/dist/frontend/assets/private/threejs-demo.html', () => {

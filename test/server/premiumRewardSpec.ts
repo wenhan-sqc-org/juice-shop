@@ -21,9 +21,7 @@ describe('premiumReward', () => {
   beforeEach(() => {
     res = { sendFile: sinon.spy() }
     req = {}
-    save = () => ({
-      then () { }
-    })
+    save = () => Promise.resolve()
   })
 
   it('should serve /frontend/dist/frontend/assets/private/JuiceShop_Wallpaper_1920x1080_VR.jpg', () => {

@@ -24,9 +24,7 @@ describe('redirect', () => {
     req = { query: {} }
     res = { redirect: sinon.spy(), status: sinon.spy() }
     next = sinon.spy()
-    save = () => ({
-      then () { }
-    })
+    save = () => Promise.resolve()
   })
 
   describe('should be performed for all allowlisted URLs', () => {
