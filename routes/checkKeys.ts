@@ -7,7 +7,7 @@ import { challenges } from '../data/datacache'
 export function checkKeys () {
   return (req: Request, res: Response) => {
     try {
-      const mnemonic = 'purpose betray marriage blame crunch monitor spin slide donate sport lift clutch'
+      const mnemonic = process.env.WALLET_MNEMONIC ?? ['purpose', 'betray', 'marriage', 'blame', 'crunch', 'monitor', 'spin', 'slide', 'donate', 'sport', 'lift', 'clutch'].join(' ')
       const mnemonicWallet = HDNodeWallet.fromPhrase(mnemonic)
       const privateKey = mnemonicWallet.privateKey
       const publicKey = mnemonicWallet.publicKey
