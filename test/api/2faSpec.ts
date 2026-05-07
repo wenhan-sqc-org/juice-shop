@@ -148,10 +148,11 @@ describe('/rest/2fa/verify', () => {
   })
 
   it('POST should fail if a unsigned tmp token is used', async () => {
+    const wrongKey = security.hash('wrong_key_' + Date.now().toString())
     const tmpTokenWurstbrot = jwt.sign({
       userId: 10,
       type: 'password_valid_needs_second_factor_token'
-    }, 'this_surly_isnt_the_right_key')
+    }, wrongKey)
 
     const totpToken = otplib.authenticator.generate('IFTXE3SPOEYVURT2MRYGI52TKJ4HC3KH')
 
