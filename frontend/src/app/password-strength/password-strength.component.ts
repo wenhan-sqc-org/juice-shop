@@ -36,7 +36,7 @@ export class PasswordStrengthComponent implements OnChanges {
       this.containAtLeastOneSpecialChar
     ]
 
-    return checks.filter(x => x).length / checks.length * 100 // calculate percentage of checks passed
+    return checks.filter(Boolean).length / checks.length * 100 // calculate percentage of checks passed
   }
 
   get progressColor (): string {
