@@ -10,8 +10,8 @@ export function fromQueryParams (queryParams: Readonly<Params>): FilterSetting {
   if (queryParams.difficulties) {
     filterSetting.difficulties = queryParams.difficulties
       .split(',')
-      .map((difficulty) => parseInt(difficulty, 10))
-      .filter((difficulty) => !isNaN(difficulty))
+      .map((difficulty) => Number.parseInt(difficulty, 10))
+      .filter((difficulty) => !Number.isNaN(difficulty))
   }
   if (queryParams.tags) {
     filterSetting.tags = queryParams.tags.split(',')
