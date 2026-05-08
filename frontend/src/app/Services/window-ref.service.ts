@@ -15,5 +15,5 @@ export class WindowRefService {
 }
 
 function getWindow (): any {
-  return window
+  return globalThis
 }

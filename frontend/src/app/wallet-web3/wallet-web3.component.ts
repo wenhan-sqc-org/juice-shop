@@ -18,7 +18,7 @@ import { TranslateModule } from '@ngx-translate/core'
 import { NgIf } from '@angular/common'
 import { MatButtonModule } from '@angular/material/button'
 import { MatCardModule } from '@angular/material/card'
-const { ethereum } = window
+const { ethereum } = globalThis
 const BankAddress = '0x413744D59d31AFDC2889aeE602636177805Bd7b0'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const client = createClient({

@@ -97,12 +97,12 @@ function getCompleteChallengeStatus (
     return 'unsolved'
   }
 
-  if (!challenge.hasCodingChallenge) {
-    return challenge.solved ? 'solved' : 'unsolved'
-  } else {
+  if (challenge.hasCodingChallenge) {
     if (challenge.codingChallengeStatus === 2) {
       return 'solved'
     }
     return 'partially-solved'
+  } else {
+    return challenge.solved ? 'solved' : 'unsolved'
   }
 }
