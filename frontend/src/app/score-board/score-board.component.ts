@@ -71,8 +71,9 @@ export class ScoreBoardComponent implements OnInit, OnDestroy {
       this.challengeService.find({ sort: 'name' }),
       this.codeSnippetService.challenges(),
       this.configurationService.getApplicationConfiguration()
-    ]).subscribe(([challenges, challengeKeysWithCodeChallenges, applicationConfiguration]) => {
+    ]).subscribe(([challenges, challengeKeysWithCodeChallengesArray, applicationConfiguration]) => {
       this.applicationConfiguration = applicationConfiguration
+      const challengeKeysWithCodeChallenges = new Set(challengeKeysWithCodeChallengesArray)
 
       const transformedChallenges = challenges.map((challenge) => {
         return {
@@ -80,7 +81,7 @@ export class ScoreBoardComponent implements OnInit, OnDestroy {
           tagList: challenge.tags ? challenge.tags.split(',').map((tag) => tag.trim()) : [],
           originalDescription: challenge.description as string,
           description: this.sanitizer.bypassSecurityTrustHtml(challenge.description as string),
-          hasCodingChallenge: challengeKeysWithCodeChallenges.includes(challenge.key)
+          hasCodingChallenge: challengeKeysWithCodeChallenges.has(challenge.key)
         }
       })
       this.allChallenges = transformedChallenges
