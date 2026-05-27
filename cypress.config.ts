@@ -31,17 +31,17 @@ export default defineConfig({
           }
         },
         GetChristmasProduct () {
-          return config.get<ProductConfig[]>('products').filter(
+          return config.get<ProductConfig[]>('products').find(
             (product) => product.useForChristmasSpecialChallenge
-          )[0]
+          )
         },
         GetCouponIntent () {
           const trainingData = require(`data/chatbot/${utils.extractFilename(
             config.get('application.chatBot.trainingData')
           )}`)
-          const couponIntent = trainingData.data.filter(
+          const couponIntent = trainingData.data.find(
             (data: { intent: string }) => data.intent === 'queries.couponCode'
-          )[0]
+          )
           return couponIntent
         },
         GetFromMemories (property: string) {
@@ -58,9 +58,9 @@ export default defineConfig({
           return config.get('challenges.overwriteUrlForProductTamperingChallenge')
         },
         GetPastebinLeakProduct () {
-          return config.get<ProductConfig[]>('products').filter(
+          return config.get<ProductConfig[]>('products').find(
             (product) => product.keywordsForPastebinDataLeakChallenge
-          )[0]
+          )
         },
         GetTamperingProductId () {
           const products = config.get<ProductConfig[]>('products')
