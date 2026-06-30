@@ -5,7 +5,7 @@
 
 'use strict'
 
-module.exports = function (grunt) {
+module.exports = function gruntConfig (grunt) {
   const os = grunt.option('os') || process.env.PCKG_OS_NAME || ''
   const platform = grunt.option('platform') || process.env.PCKG_CPU_ARCH || ''
   const node = grunt.option('node') || process.env.nodejs_version || process.env.PCKG_NODE_VERSION || ''
