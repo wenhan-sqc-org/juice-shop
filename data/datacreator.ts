@@ -36,7 +36,7 @@ import replace from 'replace'
 
 const entities = new Entities()
 
-export default async () => {
+export default async function datacreator () {
   const creators = [
     createSecurityQuestions,
     createUsers,
@@ -81,7 +81,7 @@ async function createChallenges () {
           key,
           name,
           category,
-          tags: (tags != null) ? tags.join(',') : undefined,
+          tags: (tags == null) ? undefined : tags.join(','),
           // todo(@J12934) currently missing the 'not available' text. Needs changes to the model and utils functions
           description: isChallengeEnabled ? description : (description + ' <em>(This challenge is <strong>potentially harmful</strong> on ' + disabledBecause + '!)</em>'),
           difficulty,
@@ -90,7 +90,7 @@ async function createChallenges () {
           hintUrl: showHints ? hintUrl : null,
           mitigationUrl: showMitigations ? mitigationUrl : null,
           disabledEnv: disabledBecause,
-          tutorialOrder: (tutorial != null) ? tutorial.order : null,
+          tutorialOrder: (tutorial == null) ? null : tutorial.order,
           codingChallengeStatus: 0
         })
       } catch (err) {
@@ -209,21 +209,21 @@ async function deleteProduct (productId: number) {
   })
 }
 
+function makeRandomString (length: number) {
+  let text = ''
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+
+  for (let i = 0; i < length; i++) { text += possible.charAt(Math.floor(Math.random() * possible.length)) }
+
+  return text
+}
+
+function getGeneratedRandomFakeUserEmail () {
+  const randomDomain = makeRandomString(4).toLowerCase() + '.' + makeRandomString(2).toLowerCase()
+  return makeRandomString(5).toLowerCase() + '@' + randomDomain
+}
+
 async function createRandomFakeUsers () {
-  function getGeneratedRandomFakeUserEmail () {
-    const randomDomain = makeRandomString(4).toLowerCase() + '.' + makeRandomString(2).toLowerCase()
-    return makeRandomString(5).toLowerCase() + '@' + randomDomain
-  }
-
-  function makeRandomString (length: number) {
-    let text = ''
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-
-    for (let i = 0; i < length; i++) { text += possible.charAt(Math.floor(Math.random() * possible.length)) }
-
-    return text
-  }
-
   return await Promise.all(new Array(config.get('application.numberOfRandomFakeUsers')).fill(0).map(
     async () => await UserModel.create({
       email: getGeneratedRandomFakeUserEmail(),
@@ -352,28 +352,27 @@ async function createProducts () {
             logger.error(`Could not insert Product ${product.name}: ${utils.getErrorMessage(err)}`)
           }
         ).then(async (persistedProduct) => {
-          if (persistedProduct != null) {
-            if (useForChristmasSpecialChallenge) { datacache.products.christmasSpecial = persistedProduct }
-            if (urlForProductTamperingChallenge) {
-              datacache.products.osaft = persistedProduct
-              await datacache.challenges.changeProductChallenge.update({
-                description: customizeChangeProductChallenge(
-                  datacache.challenges.changeProductChallenge.description,
-                  config.get('challenges.overwriteUrlForProductTamperingChallenge'),
-                  persistedProduct)
-              })
-            }
-            if (fileForRetrieveBlueprintChallenge && datacache.challenges.retrieveBlueprintChallenge.hint !== null) {
-              await datacache.challenges.retrieveBlueprintChallenge.update({
-                hint: customizeRetrieveBlueprintChallenge(
-                  datacache.challenges.retrieveBlueprintChallenge.hint,
-                  persistedProduct)
-              })
-            }
-            if (deletedDate) void deleteProduct(persistedProduct.id) // TODO Rename into "isDeleted" or "deletedFlag" in config for v14.x release
-          } else {
+          if (persistedProduct == null) {
             throw new Error('No persisted product found!')
           }
+          if (useForChristmasSpecialChallenge) { datacache.products.christmasSpecial = persistedProduct }
+          if (urlForProductTamperingChallenge) {
+            datacache.products.osaft = persistedProduct
+            await datacache.challenges.changeProductChallenge.update({
+              description: customizeChangeProductChallenge(
+                datacache.challenges.changeProductChallenge.description,
+                config.get('challenges.overwriteUrlForProductTamperingChallenge'),
+                persistedProduct)
+            })
+          }
+          if (fileForRetrieveBlueprintChallenge && datacache.challenges.retrieveBlueprintChallenge.hint !== null) {
+            await datacache.challenges.retrieveBlueprintChallenge.update({
+              hint: customizeRetrieveBlueprintChallenge(
+                datacache.challenges.retrieveBlueprintChallenge.hint,
+                persistedProduct)
+            })
+          }
+          if (deletedDate) void deleteProduct(persistedProduct.id) // TODO Rename into "isDeleted" or "deletedFlag" in config for v14.x release
           return persistedProduct
         })
           .then(async ({ id }: { id: number }) =>
@@ -394,15 +393,16 @@ async function createProducts () {
     )
   )
 
-  function customizeChangeProductChallenge (description: string, customUrl: string, customProduct: Product) {
-    let customDescription = description.replace(/OWASP SSL Advanced Forensic Tool \(O-Saft\)/g, customProduct.name)
-    customDescription = customDescription.replace('https://owasp.slack.com', customUrl)
-    return customDescription
-  }
+}
 
-  function customizeRetrieveBlueprintChallenge (hint: string, customProduct: Product) {
-    return hint.replace(/OWASP Juice Shop Logo \(3D-printed\)/g, customProduct.name)
-  }
+function customizeChangeProductChallenge (description: string, customUrl: string, customProduct: Product) {
+  let customDescription = description.replace(/OWASP SSL Advanced Forensic Tool \(O-Saft\)/g, customProduct.name)
+  customDescription = customDescription.replace('https://owasp.slack.com', customUrl)
+  return customDescription
+}
+
+function customizeRetrieveBlueprintChallenge (hint: string, customProduct: Product) {
+  return hint.replace(/OWASP Juice Shop Logo \(3D-printed\)/g, customProduct.name)
 }
 
 async function createBaskets () {
