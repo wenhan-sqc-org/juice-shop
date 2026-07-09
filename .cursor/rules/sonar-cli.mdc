@@ -1,0 +1,96 @@
+---
+description: SonarQube CLI usage reference for code quality and security scanning
+alwaysApply: false
+---
+
+# SonarQube CLI Reference
+
+> Full machine-readable docs: https://www.sonarsource.com/sonarqube/cli/llms.txt  
+> Version: 1.3.0 | Source: https://github.com/SonarSource/sonarqube-cli
+
+## Install
+
+```bash
+# macOS/Linux
+curl -o- https://raw.githubusercontent.com/SonarSource/sonarqube-cli/refs/heads/master/user-scripts/install.sh | bash
+```
+
+## Authentication
+
+```bash
+sonar auth login                        # Browser-based login (must be run manually)
+sonar auth login -s https://sonarcloud.io -o my-org   # SonarQube Cloud EU
+sonar auth status                       # Verify active connection
+sonar auth logout
+```
+
+## List Issues & Projects
+
+```bash
+sonar list projects                          # Discover available projects
+sonar list projects -q my-project            # Filter by name/key
+sonar list issues -p my-project              # All issues for a project
+sonar list issues -p my-project --format toon  # LLM-optimized output (use this in agents)
+sonar list issues -p my-project --statuses OPEN,CONFIRMED
+sonar list issues -p my-project --severities HIGH,BLOCKER
+```
+
+## Analyze Code
+
+```bash
+# Secrets scanning
+sonar analyze secrets src/config.ts
+sonar analyze secrets src/file1.ts src/file2.ts
+cat .env | sonar analyze secrets --stdin
+
+# Dependency risks
+sonar analyze dependency-risks -p my-project
+sonar analyze dependency-risks -p my-project --statuses active --min-severity HIGH
+
+# Agentic analysis (SonarQube Cloud only)
+sonar analyze agentic                        # Changed files vs git diff
+sonar analyze agentic --staged               # Staged files only
+sonar analyze agentic --base main            # Files changed vs main branch
+sonar analyze agentic --file src/foo.ts      # Specific file
+sonar analyze agentic --depth DEEP           # Cross-file analysis (default for multi-file)
+```
+
+## Remediate Issues
+
+```bash
+sonar remediate -p my-project                # Interactive — pick issues to fix
+sonar remediate -p my-project --issues AYx1z2,AYx1z3   # Non-interactive (max 20)
+```
+
+## Cursor Integration
+
+```bash
+sonar integrate cursor -p my-project         # Project-level: MCP + hooks + Vortex
+sonar integrate cursor -g                    # Global: installs to ~/.cursor
+sonar integrate git                          # Pre-commit secrets scan hook
+sonar integrate git --hook pre-push --global
+```
+
+## Direct API Access
+
+```bash
+sonar api get "/api/rules/search?languages=ts"
+sonar api post "/api/issues/do_transition" --data '{"issue":"AYx1z2","transition":"accept"}'
+sonar api get "/api/system/status" --verbose
+```
+
+## System & Updates
+
+```bash
+sonar system status         # Show auth, installed binaries, integrations
+sonar self-update           # Update CLI to latest version
+sonar self-update --status  # Check for newer version without installing
+sonar system reset          # Factory reset (removes tokens, binaries, cache)
+```
+
+## Tips for Agents
+
+- Use `--format toon` with `sonar list issues` for LLM-friendly output.
+- `sonar auth login` cannot be automated — it opens a browser. Use env vars for CI.
+- Prefer `sonar analyze agentic --base main` to scope analysis to your branch's changes.
+- `DEEP` depth analysis catches cross-file issues; use `STANDARD` for faster single-file checks.
